@@ -29,9 +29,21 @@
 
 #import "TUSafariActivity.h"
 
+@interface TUSafariActivity ()
+
+@property (nonatomic, retain) NSURL *url;
+
+@end
+
+
 @implementation TUSafariActivity
+
+@synthesize url = url_;
+
+- (void)dealloc
 {
-	NSURL *_URL;
+	[url_ release];
+	[super dealloc];
 }
 
 - (NSString *)activityType
@@ -69,7 +81,7 @@
 			return YES;
 		}
 	}
-	
+
 	return NO;
 }
 
@@ -77,15 +89,15 @@
 {
 	for (id activityItem in activityItems) {
 		if ([activityItem isKindOfClass:[NSURL class]]) {
-			_URL = activityItem;
+			self.url = activityItem;
 		}
 	}
 }
 
 - (void)performActivity
 {
-	BOOL completed = [[UIApplication sharedApplication] openURL:_URL];
-	
+	BOOL completed = [[UIApplication sharedApplication] openURL:self.url];
+
 	[self activityDidFinish:completed];
 }
 

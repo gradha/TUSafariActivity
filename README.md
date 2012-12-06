@@ -7,7 +7,7 @@
 ## Requirements
 
 - As `UIActivity` is iOS 6 only, so is the subclass.
-- This project uses ARC. If you want to use it in a non ARC project, you must add the `-fobjc-arc` compiler flag to TUSafariActivity.m in Target Settings > Build Phases > Compile Sources.
+- This project doesn't use ARC. If you want an ARC version check out https://github.com/davbeck/TUSafariActivity, the original fork.
 
 ## Installation
 
@@ -21,8 +21,10 @@ Simply `alloc`/`init` an instance of `TUSafariActivity` and pass that object int
 
 ```objectivec
 NSURL *URL = [NSURL URLWithString:@"http://google.com"];
-TUSafariActivity *activity = [[TUSafariActivity alloc] init];
-UIActivityViewController *activityViewController = [[UIActivityViewController alloc] initWithActivityItems:@[URL] applicationActivities:@[activity]];
+TUSafariActivity *activity = [[TUSafariActivity new] autorelease];
+UIActivityViewController *activityViewController =
+	[[[UIActivityViewController alloc] initWithActivityItems:@[URL]
+	applicationActivities:@[activity]] autorelease];
 ```
 
 Note that you can include the activity in any `UIActivityViewController` and it will only be shown to the user if there is a URL in the activity items.
