@@ -28,6 +28,33 @@
 //
 
 #import "TUSafariActivity.h"
+#import <objc/runtime.h>
+
+// Stores the result of the initialize method.
+static BOOL gIsAvailable;
+
+@interface TUDummyActivity ()
+// These dummy properties seem to "make space" in memory for the superclass.
+// Without them, calling activityDidFinish: will crash on the device. Maybe the
+// UIActivity class defines private properties and this helps the compiler give
+// the necessary space for them?
+//
+// For further discussion see http://stackoverflow.com/a/13745244/172690
+@property (nonatomic, assign) int dummy1;
+@property (nonatomic, assign) int dummy2;
+@property (nonatomic, assign) int dummy3;
+@property (nonatomic, assign) int dummy4;
+@property (nonatomic, assign) int dummy5;
+@property (nonatomic, assign) int dummy6;
+@property (nonatomic, assign) int dummy7;
+@property (nonatomic, assign) int dummy8;
+@property (nonatomic, assign) int dummy9;
+@end
+
+@implementation TUDummyActivity
+- (void)activityDidFinish:(BOOL)completed {}
+
+@end
 
 @interface TUSafariActivity ()
 
@@ -40,10 +67,34 @@
 
 @synthesize url = url_;
 
+/** Checks the availability of the UIActivity class at runtime.
+ * If the class is available, the super class is swizzled to that one and sets
+ * gIsAvailable to true, so that end user code knows the class can be
+ * instantiated correctly.
+ */
++ (void)initialize
+{
+	Class activity_class = objc_getClass("UIActivity");
+	if (activity_class) {
+		class_setSuperclass([TUSafariActivity class], activity_class);
+		gIsAvailable = YES;
+	}
+#ifdef DEBUG
+	NSLog(@"Parent of TUSafariActivity is %@, available: %d",
+		[[TUSafariActivity class] superclass], gIsAvailable);
+#endif
+}
+
 - (void)dealloc
 {
 	[url_ release];
 	[super dealloc];
+}
+
+// Returns YES if instantiating a TUSafariActivity is safe and makes sense.
++ (BOOL)isAvailable
+{
+	return gIsAvailable;
 }
 
 - (NSString *)activityType

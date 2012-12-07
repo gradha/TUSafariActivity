@@ -29,6 +29,12 @@
 
 #import <UIKit/UIKit.h>
 
-@interface TUSafariActivity : UIActivity
+@interface TUDummyActivity : NSObject
+- (void)activityDidFinish:(BOOL)completed;
+@end
+
+@interface TUSafariActivity : TUDummyActivity
+
++ (BOOL)isAvailable;
 
 @end
